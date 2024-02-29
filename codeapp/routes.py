@@ -28,16 +28,46 @@ bp = Blueprint("bp", __name__, url_prefix="/")
 
 @bp.get("/")  # root route
 def home() -> Response:
-    # TODO
-    pass
 
+    dataset: list[models.AI_and_ML_jobs] = get_data_list()
+
+    counter: dict[int, int] = calculate_statistics(dataset)
+
+    return render_template("home.html", counter=counter)
 
 @bp.get("/image")
 def image() -> Response:
+
+    dataset: list[models.AI_and_ML_jobs] = get_data_list()
+
+    counter: dict[str, int] = calculate_statistics(dataset)
+
+        
+    unique_locations: list[str] = []
+    max_Salarys: list[float] = []
+    for n in counter:
+        unique_locations.append(n)
+        max_Salarys.append(counter[n])
+
+    max_Sal_uni_loc = zip(max_Salarys, unique_locations)
+
+    max_Sal_uni_loc = sorted(max_Sal_uni_loc)[::-1]
+
+    max_Salarys = [y for x, y in max_Sal_uni_loc]
+    unique_locations = [x for x, y in max_Sal_uni_loc]
+
+    # print(len(unique_locations))
+
     # creating the plot
     fig = Figure()
 
-    # TODO: populate the plot
+    fig.gca().bar(max_Salarys, unique_locations, width = 0.4)
+
+    fig.gca().set_xlabel("Locations")
+    fig.gca().set_ylabel("Highest Salary $/year")
+    fig.gca().set_xticklabels(max_Salarys, rotation = 90)
+    fig.tight_layout()
+
 
     ################ START -  THIS PART MUST NOT BE CHANGED BY STUDENTS ################
     # create a string buffer to hold the final code for the plot
@@ -58,11 +88,18 @@ def about() -> Response:
 
 @bp.get("/json-dataset")
 def get_json_dataset() -> Response:
-    # TODO
-    pass
+
+    dataset: list[models.AI_and_ML_jobs] = get_data_list()
+
+    return jsonify(dataset)
+
 
 
 @bp.get("/json-stats")
 def get_json_stats() -> Response:
-    # TODO
-    pass
+
+    dataset: list[models.AI_and_ML_jobs] = get_data_list()
+
+    counter: dict[int, int] = calculate_statistics(dataset)
+
+    return jsonify(counter)
