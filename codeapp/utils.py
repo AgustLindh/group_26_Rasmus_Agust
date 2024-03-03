@@ -19,7 +19,7 @@ def get_data_list() -> list[AiAndMlJobs]:
     path = "AiAndMlJobs.csv"
     urlretrieve(url, path)
 
-    with open(path, encoding='utf-8') as csvfile:
+    with open(path, encoding="utf-8") as csvfile:
         csv_data = csv.DictReader(csvfile)
 
         type_data: list[AiAndMlJobs] = []
@@ -29,15 +29,17 @@ def get_data_list() -> list[AiAndMlJobs]:
         for row_raw in csv_data:
             row = list(row_raw.values())
 
-            type_data.append(AiAndMlJobs(
-                str(row[0]),
-                str(row[1]),
-                str(row[2]),
-                str(row[3]),
-                str(row[4]),
-                float(row[5]),
-                list(ast.literal_eval(row[6])),
-            ))
+            type_data.append(
+                AiAndMlJobs(
+                    str(row[0]),
+                    str(row[1]),
+                    str(row[2]),
+                    str(row[3]),
+                    str(row[4]),
+                    float(row[5]),
+                    list(ast.literal_eval(row[6])),
+                )
+            )
 
     db.set("dataset", pickle.dumps(type_data))
 
