@@ -49,7 +49,8 @@ def image() -> Response:
         max_salarys.append(counter[n])
 
     max_sal_uni_loc: list[tuple[float, str]] = sorted(
-        zip(max_salarys, unique_locations))[::-1]
+        zip(max_salarys, unique_locations)
+    )[::-1]
 
     max_salarys = [x for x, y in max_sal_uni_loc]
     unique_locations = [y for x, y in max_sal_uni_loc]
