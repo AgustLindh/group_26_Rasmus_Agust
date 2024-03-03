@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 @dataclass
-class AI_and_ML_jobs:
+class AiAndMlJobs:
     title: str
     company: str
     location: str
@@ -15,4 +15,3 @@ class AI_and_ML_jobs:
     salary: float
     identified_skills: list[str]
     date: datetime = field(default_factory=datetime.now)
-

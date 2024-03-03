@@ -14,7 +14,7 @@ from matplotlib.figure import Figure
 from werkzeug.wrappers.response import Response as WerkzeugResponse
 
 # internal imports
-import codeapp.models as models
+from codeapp import models
 from codeapp.utils import calculate_statistics, get_data_list, prepare_figure
 
 # define the response type
@@ -28,46 +28,42 @@ bp = Blueprint("bp", __name__, url_prefix="/")
 
 @bp.get("/")  # root route
 def home() -> Response:
+    dataset: list[models.AiAndMlJobs] = get_data_list()
 
-    dataset: list[models.AI_and_ML_jobs] = get_data_list()
-
-    counter: dict[int, int] = calculate_statistics(dataset)
+    counter: dict[str, int] = calculate_statistics(dataset)
 
     return render_template("home.html", counter=counter)
+
 
 @bp.get("/image")
 def image() -> Response:
 
-    dataset: list[models.AI_and_ML_jobs] = get_data_list()
+    dataset: list[models.AiAndMlJobs] = get_data_list()
 
     counter: dict[str, int] = calculate_statistics(dataset)
 
-        
     unique_locations: list[str] = []
-    max_Salarys: list[float] = []
+    max_salarys: list[float] = []
     for n in counter:
         unique_locations.append(n)
-        max_Salarys.append(counter[n])
+        max_salarys.append(counter[n])
 
-    max_Sal_uni_loc = zip(max_Salarys, unique_locations)
+    max_sal_uni_loc: list[tuple[float, str]] = sorted(
+        zip(max_salarys, unique_locations))[::-1]
 
-    max_Sal_uni_loc = sorted(max_Sal_uni_loc)[::-1]
-
-    max_Salarys = [y for x, y in max_Sal_uni_loc]
-    unique_locations = [x for x, y in max_Sal_uni_loc]
-
-    # print(len(unique_locations))
+    max_salarys = [x for x, y in max_sal_uni_loc]
+    unique_locations = [y for x, y in max_sal_uni_loc]
 
     # creating the plot
     fig = Figure()
 
-    fig.gca().bar(max_Salarys, unique_locations, width = 0.4)
+    fig.gca().bar(unique_locations, max_salarys, width=0.4)
 
     fig.gca().set_xlabel("Locations")
     fig.gca().set_ylabel("Highest Salary $/year")
-    fig.gca().set_xticklabels(max_Salarys, rotation = 90)
+    fig.gca().set_xticks(range(len(unique_locations)))
+    fig.gca().set_xticklabels(unique_locations, rotation=90)
     fig.tight_layout()
-
 
     ################ START -  THIS PART MUST NOT BE CHANGED BY STUDENTS ################
     # create a string buffer to hold the final code for the plot
@@ -89,17 +85,16 @@ def about() -> Response:
 @bp.get("/json-dataset")
 def get_json_dataset() -> Response:
 
-    dataset: list[models.AI_and_ML_jobs] = get_data_list()
+    dataset: list[models.AiAndMlJobs] = get_data_list()
 
     return jsonify(dataset)
-
 
 
 @bp.get("/json-stats")
 def get_json_stats() -> Response:
 
-    dataset: list[models.AI_and_ML_jobs] = get_data_list()
+    dataset: list[models.AiAndMlJobs] = get_data_list()
 
-    counter: dict[int, int] = calculate_statistics(dataset)
+    counter: dict[str, int] = calculate_statistics(dataset)
 
     return jsonify(counter)

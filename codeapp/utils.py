@@ -1,55 +1,68 @@
 # built-in imports
 # standard library imports
-import pickle
+import ast
 import csv
-
-# external imports
-from flask import current_app
+import pickle
+from urllib.request import urlretrieve
 
 # internal imports
 from codeapp import db
-from codeapp.models import AI_and_ML_jobs
+from codeapp.models import AiAndMlJobs
 
-from urllib.request import urlretrieve
 
-def get_data_list() -> list[AI_and_ML_jobs]:
+def get_data_list() -> list[AiAndMlJobs]:
     """
     Function responsible for downloading the dataset from the source, translating it
     into a list of Python objects, and saving it to a Redis list.
     """
     url = " https://onu1.s2.chalmers.se/datasets/AI_ML_jobs.csv"
-    path = "AI_and_ML_jobs.csv"
+    path = "AiAndMlJobs.csv"
     urlretrieve(url, path)
 
-    with open(path,  encoding='utf-8') as csvfile:
+    with open(path, encoding='utf-8') as csvfile:
         csv_data = csv.DictReader(csvfile)
-   
-        rows = [AI_and_ML_jobs(*row.values()) for row in csv_data]
-    
-    db.set("dataset", pickle.dumps(rows))
 
-    return rows
+        type_data: list[AiAndMlJobs] = []
+
+        row: list[str]
+
+        for row_raw in csv_data:
+            row = list(row_raw.values())
+
+            type_data.append(AiAndMlJobs(
+                str(row[0]),
+                str(row[1]),
+                str(row[2]),
+                str(row[3]),
+                str(row[4]),
+                float(row[5]),
+                list(ast.literal_eval(row[6])),
+            ))
+
+    db.set("dataset", pickle.dumps(type_data))
+
+    return type_data
 
 
-def calculate_statistics(dataset: list[AI_and_ML_jobs]) -> dict[int | str, int]:
+def calculate_statistics(dataset: list[AiAndMlJobs]) -> dict[str, int]:
     """
     Receives the dataset in the form of a list of Python objects, and calculates the
     statistics necessary.
     """
     locations = [row.location for row in dataset]
 
-    max_Salarys: list[float] = []
+    max_salarys: list[int] = []
     unique_locations: list[str] = []
-    location_Salarys: list[float] = []
+    location_salarys: list[float] = []
     for location in set(locations):
-        location_Salarys = []
+        location_salarys = []
         for row in dataset:
             if row.location == location:
-                location_Salarys.append(float(row.salary))
-        max_Salarys.append(max(location_Salarys))
+                location_salarys.append(float(row.salary))
+        max_salarys.append(int(max(location_salarys)))
         unique_locations.append(location)
 
-    out_dict: dict[int | str, int] = dict(zip(unique_locations, max_Salarys))
+    out_dict: dict[str, int] = dict(zip(unique_locations, max_salarys))
 
     return out_dict
 
