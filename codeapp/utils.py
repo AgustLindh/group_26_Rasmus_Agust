@@ -19,12 +19,12 @@ def get_data_list() -> list[AiAndMlJobs]:
     path = "AiAndMlJobs.csv"
     urlretrieve(url, path)
 
-    with open(path, encoding="utf-8") as csvfile:
+    with open(path, encoding="utf-8", mode="r") as csvfile:
         csv_data = csv.DictReader(csvfile)
 
         type_data: list[AiAndMlJobs] = []
 
-        row: list[str]
+        row: list[str] = []
 
         for row_raw in csv_data:
             row = list(row_raw.values())
@@ -60,7 +60,7 @@ def calculate_statistics(dataset: list[AiAndMlJobs]) -> dict[str, int]:
         location_salarys = []
         for row in dataset:
             if row.location == location:
-                location_salarys.append(float(row.salary))
+                location_salarys.append(row.salary)
         max_salarys.append(int(max(location_salarys)))
         unique_locations.append(location)
 

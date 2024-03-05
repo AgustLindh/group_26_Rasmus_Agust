@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 # python built-in imports
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 
 
 @dataclass
@@ -14,4 +13,3 @@ class AiAndMlJobs:
     job_description: str
     salary: float
     identified_skills: list[str]
-    date: datetime = field(default_factory=datetime.now)

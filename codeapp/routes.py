@@ -42,6 +42,7 @@ def image() -> Response:
 
     counter: dict[str, int] = calculate_statistics(dataset)
 
+    # sorting by salary to make the graph easier to read
     unique_locations: list[str] = []
     max_salarys: list[float] = []
     for n in counter:
@@ -52,18 +53,19 @@ def image() -> Response:
         zip(max_salarys, unique_locations)
     )[::-1]
 
-    max_salarys = [x for x, y in max_sal_uni_loc]
-    unique_locations = [y for x, y in max_sal_uni_loc]
+    max_salarys = [max_sal for max_sal, uni_loc in max_sal_uni_loc]
+    unique_locations = [uni_loc for max_sal, uni_loc in max_sal_uni_loc]
 
     # creating the plot
     fig = Figure()
+    ax = fig.gca()
 
-    fig.gca().bar(unique_locations, max_salarys, width=0.4)
+    ax.bar(unique_locations, max_salarys, width=0.4)
 
-    fig.gca().set_xlabel("Locations")
-    fig.gca().set_ylabel("Highest Salary $/year")
-    fig.gca().set_xticks(range(len(unique_locations)))
-    fig.gca().set_xticklabels(unique_locations, rotation=90)
+    ax.set_xlabel("Locations")
+    ax.set_ylabel("Highest Salary $/year")
+    ax.set_xticks(range(len(unique_locations)))
+    ax.set_xticklabels(unique_locations, rotation=90)
     fig.tight_layout()
 
     ################ START -  THIS PART MUST NOT BE CHANGED BY STUDENTS ################
