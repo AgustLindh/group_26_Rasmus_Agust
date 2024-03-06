@@ -6,6 +6,8 @@ import pickle
 from urllib.request import urlretrieve
 
 # internal imports
+from flask import current_app
+
 from codeapp import db
 from codeapp.models import AiAndMlJobs
 
@@ -15,14 +17,23 @@ def get_data_list() -> list[AiAndMlJobs]:
     Function responsible for downloading the dataset from the source, translating it
     into a list of Python objects, and saving it to a Redis list.
     """
+    type_data: list[AiAndMlJobs] = []
+    db.delete("dataset")
+    if db.exists("dataset") > 0:
+        current_app.logger.info("Dataset already downloaded.")
+        raw_dataset: bytes | None = db.get("dataset")
+        if raw_dataset is not None:
+            type_data = pickle.loads(raw_dataset)
+            return type_data
+
+    current_app.logger.info("Downloading dataset.")
+
     url = " https://onu1.s2.chalmers.se/datasets/AI_ML_jobs.csv"
     path = "AiAndMlJobs.csv"
     urlretrieve(url, path)
 
     with open(path, encoding="utf-8", mode="r") as csvfile:
         csv_data = csv.DictReader(csvfile)
-
-        type_data: list[AiAndMlJobs] = []
 
         row: list[str] = []
 
@@ -56,6 +67,7 @@ def calculate_statistics(dataset: list[AiAndMlJobs]) -> dict[str, int]:
     max_salarys: list[int] = []
     unique_locations: list[str] = []
     location_salarys: list[float] = []
+
     for location in set(locations):
         location_salarys = []
         for row in dataset:

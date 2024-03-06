@@ -43,18 +43,10 @@ def image() -> Response:
     counter: dict[str, int] = calculate_statistics(dataset)
 
     # sorting by salary to make the graph easier to read
-    unique_locations: list[str] = []
-    max_salarys: list[float] = []
-    for n in counter:
-        unique_locations.append(n)
-        max_salarys.append(counter[n])
+    sorted_counter = sorted(counter.items(), key=lambda x: x[1])[::-1]
 
-    max_sal_uni_loc: list[tuple[float, str]] = sorted(
-        zip(max_salarys, unique_locations)
-    )[::-1]
-
-    max_salarys = [max_sal for max_sal, uni_loc in max_sal_uni_loc]
-    unique_locations = [uni_loc for max_sal, uni_loc in max_sal_uni_loc]
+    unique_locations = [x for x, y in sorted_counter]
+    max_salarys = [y for x, y in sorted_counter]
 
     # creating the plot
     fig = Figure()
