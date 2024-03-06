@@ -18,13 +18,12 @@ def get_data_list() -> list[AiAndMlJobs]:
     into a list of Python objects, and saving it to a Redis list.
     """
     type_data: list[AiAndMlJobs] = []
-    db.delete("dataset")
-    if db.exists("dataset") > 0:
+    if db.exists("dataset_list") > 0:
         current_app.logger.info("Dataset already downloaded.")
-        raw_dataset: bytes | None = db.get("dataset")
-        if raw_dataset is not None:
-            type_data = pickle.loads(raw_dataset)
-            return type_data
+        raw_dataset: list[bytes] = db.lrange("dataset_list", 0, -1)
+        for item in raw_dataset:
+            type_data.append(pickle.loads(item))  # load item from DB
+        return type_data
 
     current_app.logger.info("Downloading dataset.")
 
@@ -39,20 +38,17 @@ def get_data_list() -> list[AiAndMlJobs]:
 
         for row_raw in csv_data:
             row = list(row_raw.values())
-
-            type_data.append(
-                AiAndMlJobs(
-                    str(row[0]),
-                    str(row[1]),
-                    str(row[2]),
-                    str(row[3]),
-                    str(row[4]),
-                    float(row[5]),
-                    list(ast.literal_eval(row[6])),
-                )
+            aiandmljob = AiAndMlJobs(
+                str(row[0]),
+                str(row[1]),
+                str(row[2]),
+                str(row[3]),
+                str(row[4]),
+                float(row[5]),
+                list(ast.literal_eval(row[6])),
             )
-
-    db.set("dataset", pickle.dumps(type_data))
+            type_data.append(aiandmljob)
+            db.rpush("dataset_list", pickle.dumps(aiandmljob))
 
     return type_data
 

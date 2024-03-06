@@ -37,7 +37,6 @@ def home() -> Response:
 
 @bp.get("/image")
 def image() -> Response:
-
     dataset: list[models.AiAndMlJobs] = get_data_list()
 
     counter: dict[str, int] = calculate_statistics(dataset)
@@ -79,7 +78,6 @@ def about() -> Response:
 
 @bp.get("/json-dataset")
 def get_json_dataset() -> Response:
-
     dataset: list[models.AiAndMlJobs] = get_data_list()
 
     return jsonify(dataset)
@@ -87,7 +85,6 @@ def get_json_dataset() -> Response:
 
 @bp.get("/json-stats")
 def get_json_stats() -> Response:
-
     dataset: list[models.AiAndMlJobs] = get_data_list()
 
     counter: dict[str, int] = calculate_statistics(dataset)
