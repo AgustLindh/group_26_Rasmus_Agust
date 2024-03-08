@@ -42,10 +42,12 @@ def image() -> Response:
     counter: dict[str, int] = calculate_statistics(dataset)
 
     # sorting by salary to make the graph easier to read
-    sorted_counter = sorted(counter.items(), key=lambda x: x[1])[::-1]
+    sorted_counter: list[tuple[str, int]] = sorted(counter.items(), key=lambda x: x[1])[
+        ::-1
+    ]
 
-    unique_locations = [x for x, y in sorted_counter]
-    max_salarys = [y for x, y in sorted_counter]
+    unique_locations: list[str] = [x for x, y in sorted_counter]
+    max_salarys: list[int] = [y for x, y in sorted_counter]
 
     # creating the plot
     fig = Figure()

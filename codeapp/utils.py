@@ -27,8 +27,8 @@ def get_data_list() -> list[AiAndMlJobs]:
 
     current_app.logger.info("Downloading dataset.")
 
-    url = " https://onu1.s2.chalmers.se/datasets/AI_ML_jobs.csv"
-    path = "AiAndMlJobs.csv"
+    url: str = " https://onu1.s2.chalmers.se/datasets/AI_ML_jobs.csv"
+    path: str = "AiAndMlJobs.csv"
     urlretrieve(url, path)
 
     with open(path, encoding="utf-8", mode="r") as csvfile:
